@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { APP_BASE_PATH } from './src/config/constants';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/app/', // Base absolue pour Tomcat dans /app/
+  base: `${APP_BASE_PATH}/`,
   build: {
-    emptyOutDir: true, // nettoyer dist avant build
-  }
+    emptyOutDir: true,
+  },
 })
