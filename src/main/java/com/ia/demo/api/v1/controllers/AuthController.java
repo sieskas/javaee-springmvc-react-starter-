@@ -4,17 +4,21 @@ import com.ia.demo.api.v1.resources.UserDTO;
 import com.ia.demo.domain.User;
 import com.ia.demo.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/auth")
+@Controller
+@RequestMapping("/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -26,21 +30,18 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
-        boolean isAuthenticated = authService.authenticate(username, password, request);
+    public String login(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
+        User user = authService.validateCredentials(username, password);
 
-        if (isAuthenticated) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Authentification réussie");
-
-            return ResponseEntity.ok(response);
+        if (user != null) {
+            HttpSession session = request.getSession(true);
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("username", user.getUsername());
+            session.setAttribute("authenticated", true);
+            session.setMaxInactiveInterval(3600); // 1 heure
+            return "forward:/WEB-INF/views/index.html";
         } else {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "Identifiants invalides");
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return "redirect:/login.jsp?error=true";
         }
     }
 
@@ -68,12 +69,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
-        authService.logout(request);
+    public ResponseEntity<?> logout(HttpSession session) {
+        session.invalidate();
 
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
-        response.put("message", "Déconnexion réussie");
+        response.put("message", "Logout Successful");
 
         return ResponseEntity.ok(response);
     }

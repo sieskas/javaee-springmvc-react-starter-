@@ -25,7 +25,7 @@ public class LoginFilter implements Filter {
             return;
         }
 
-        Object user = req.getSession().getAttribute("user");
+        Object user = req.getSession().getAttribute("userId");
 
         if (path.equals("/login.jsp")) {
             if (user != null) {
@@ -36,7 +36,7 @@ public class LoginFilter implements Filter {
                 return;
             }
         }
-        if (path.startsWith("/api/v1/login")) {
+        if (path.startsWith("/api/v1/auth")) {
             chain.doFilter(request, response);
             return;
         }

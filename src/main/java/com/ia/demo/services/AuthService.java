@@ -20,10 +20,7 @@ public class AuthService {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Authentifie un utilisateur et crée une session si les identifiants sont valides
-     */
-    public boolean authenticate(String username, String password, HttpServletRequest request) {
+    public User validateCredentials(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isPresent()) {
@@ -31,18 +28,10 @@ public class AuthService {
 
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             if (encoder.matches(password, user.getPassword())) {
-                // Créer la session
-                HttpSession session = request.getSession(true);
-                session.setAttribute("userId", user.getId());
-                session.setAttribute("username", user.getUsername());
-                session.setAttribute("authenticated", true);
-                session.setMaxInactiveInterval(3600); // 1 heure
-
-                return true;
+                return user;
             }
         }
-
-        return false;
+        return null;
     }
 
     /**

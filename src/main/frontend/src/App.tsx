@@ -32,7 +32,7 @@ function App() {
     async function handleLogout() {
         try {
             const contextPath = window.location.pathname.split('/')[1];
-            const response = await fetch(`/${contextPath}/api/v1/login/logout`, {
+            const response = await fetch(`/${contextPath}/api/v1/auth/logout`, {
                 method: 'POST',
                 credentials: 'include',
             });
