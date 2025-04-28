@@ -1,18 +1,42 @@
-import { renameSync } from 'fs';
+import { renameSync, existsSync, unlinkSync, mkdirSync, readdirSync, copyFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 
-// Ajout nécessaire pour simuler __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Maintenant, tu peux utiliser __dirname normalement
-const from = resolve(__dirname, '../webapp/assets/index.html');
-const to = resolve(__dirname, '../webapp/WEB-INF/views/index.html');
+// Dossiers sources
+const buildDir = resolve(__dirname, './dist'); // Vite build ici
+const assetsDir = resolve(buildDir, 'assets');
+const indexHtml = resolve(buildDir, 'index.html');
+
+// Dossiers cibles
+const targetAssetsDir = resolve(__dirname, '../webapp/assets'); // <-- bien assets
+const targetIndexHtmlDir = resolve(__dirname, '../webapp/WEB-INF/views');
+const targetIndexHtml = resolve(targetIndexHtmlDir, 'index.html');
+
+// Déplacer assets
+function moveAssets() {
+    mkdirSync(targetAssetsDir, { recursive: true }); // Créer /assets/ s'il n'existe pas
+    const files = readdirSync(assetsDir);
+    files.forEach(file => {
+        const src = resolve(assetsDir, file);
+        const dest = resolve(targetAssetsDir, file);
+        copyFileSync(src, dest);
+    });
+    console.log('✅ Assets copiés avec succès.');
+}
+
+// Déplacer index.html
+function moveIndex() {
+    mkdirSync(targetIndexHtmlDir, { recursive: true }); // Créer /WEB-INF/views/ s'il n'existe pas
+    renameSync(indexHtml, targetIndexHtml);
+    console.log('✅ index.html déplacé avec succès.');
+}
 
 try {
-    renameSync(from, to);
-    console.log('✅ index.html déplacé avec succès.');
+    moveAssets();
+    moveIndex();
 } catch (err) {
-    console.error('❌ Erreur lors du déplacement de index.html :', err);
+    console.error('❌ Erreur lors du déplacement des fichiers :', err);
 }

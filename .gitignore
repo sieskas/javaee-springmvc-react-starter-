@@ -37,6 +37,6 @@ build/
 ### Mac OS ###
 .DS_Store
 /src/main/webapp/WEB-INF/views/index.html
-/src/main/webapp/assets/assets/index-DQu1DXTf.js
-/src/main/webapp/assets/assets/index-wWkJuIyS.css
 /src/main/webapp/assets/vite.svg
+/src/main/webapp/assets/index-*.js
+/src/main/webapp/assets/index-*.css
